@@ -8,3 +8,5 @@ node_modules
 .vscode
 .npm-debug
 npm-debug.log
+
+.publish
