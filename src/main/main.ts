@@ -121,7 +121,7 @@ window.wwState(function (w, state) {
   appState.workerState = state;
   appState.onChange.invalidate();
 
-  if (state > WorkerState.Waiting) {
+  if (db === undefined && state > WorkerState.SavingData) {
     openDB()
       .then((d) => {
         db = d;
