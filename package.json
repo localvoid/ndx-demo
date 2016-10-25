@@ -12,8 +12,7 @@
   "files": [],
   "dependencies": {
     "kivi": "^1.0.0-rc2",
-    "ndx": "^0.1.1",
-    "stemr": "^0.1.1"
+    "ndx": "^0.1.1"
   },
   "devDependencies": {
     "del": "^2.2.2",

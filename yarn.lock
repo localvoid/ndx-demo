@@ -1944,10 +1944,6 @@ stack-trace@0.0.9:
   version "0.0.9"
   resolved "https://registry.yarnpkg.com/stack-trace/-/stack-trace-0.0.9.tgz#a8f6eaeca90674c333e7c43953f275b451510695"
 
-stemr:
-  version "0.1.1"
-  resolved "https://registry.yarnpkg.com/stemr/-/stemr-0.1.1.tgz#14ec18c5d0751ed53adc24d9ddc8ee62186daa12"
-
 stream-exhaust@^1.0.1:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/stream-exhaust/-/stream-exhaust-1.0.1.tgz#c0c4455e54ce5a179ca8736e73334b4e7fd67553"

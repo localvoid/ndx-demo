@@ -3,7 +3,6 @@ import { WorkerState, ActionType, Action, RedditComment } from "./shared";
 postMessage(WorkerState.Started);
 
 import { DocumentIndex } from "ndx";
-import { stem } from "stemr";
 
 const DB_NAME = "docs";
 const DB_VERSION = 1;
@@ -31,9 +30,6 @@ function loadData(): Promise<RedditComment[]> {
 }
 
 const index = new DocumentIndex<number, RedditComment>();
-index.setFilter(function (term) {
-  return stem(term.toLowerCase().replace(/^\W+/, "").replace(/\W+$/, ""));
-});
 index.addField("author");
 index.addField("body");
 
