@@ -1457,9 +1457,9 @@ nan@^2.3.0:
   version "2.4.0"
   resolved "https://registry.yarnpkg.com/nan/-/nan-2.4.0.tgz#fb3c59d45fe4effe215f0b890f8adf6eb32d2232"
 
-ndx@^0.1.2:
-  version "0.1.2"
-  resolved "https://registry.yarnpkg.com/ndx/-/ndx-0.1.2.tgz#b4e9f656c54eb01768a72c6ac6c56c3b27ecb320"
+ndx@^0.2.0:
+  version "0.2.0"
+  resolved "https://registry.yarnpkg.com/ndx/-/ndx-0.2.0.tgz#2f03070c5e174c0bb0b01e052b9a6dcb14c9e05d"
 
 next-tick@^1.0.0:
   version "1.0.0"
