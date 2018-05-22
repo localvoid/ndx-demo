@@ -8,7 +8,6 @@ module.exports = {
   output: {
     globalObject: "this",
     filename: "bundle.js",
-    publicPath: "/",
     path: path.resolve(__dirname, "docs"),
   },
   resolve: {
