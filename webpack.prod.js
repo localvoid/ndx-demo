@@ -29,9 +29,7 @@ module.exports = merge(require("./webpack.common"), {
             comments: false,
           },
           toplevel: true,
-          mangle: {
-            safari10: true,
-          },
+          mangle: false,
         },
       }),
     ],
