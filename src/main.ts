@@ -1,6 +1,5 @@
-import { render, updateNextFrame, statefulComponent, Component, statelessComponent, connect, map } from "ivi";
+import { render, updateNextFrame, statefulComponent, Component, statelessComponent, connect, map, onInput } from "ivi";
 import { div, input } from "ivi-html";
-import { onInput } from "ivi-events";
 import Worker from "worker-loader!./worker";
 import { WorkerState, WorkerResponse, WorkerQueryRequest, SearchResult } from "./shared";
 
@@ -57,7 +56,7 @@ const SearchField = statefulComponent(class extends Component {
       input()
         .a(PLACEHOLDER)
         .e(this.events)
-        .value(this.value)
+        .value(this.value),
     );
   }
 });
@@ -105,7 +104,7 @@ const App = connect<WorkerState>(
           workerStateToText(workerState),
         ),
       ),
-  )
+  ),
 );
 
 WORKER.addEventListener("message", (e) => {
