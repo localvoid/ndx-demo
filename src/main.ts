@@ -1,5 +1,7 @@
-import { render, updateNextFrame, statefulComponent, Component, statelessComponent, connect, map, onInput } from "ivi";
-import { div, input } from "ivi-html";
+import {
+  _, render, requestDirtyCheck, statelessComponent, onInput, selector, component, TrackByKey, key, Events,
+} from "ivi";
+import { div, input, VALUE } from "ivi-html";
 import Worker from "worker-loader!./worker";
 import { WorkerState, WorkerResponse, WorkerQueryRequest, SearchResult } from "./shared";
 
@@ -16,6 +18,10 @@ const STATE = {
   results: null as SearchResult[] | null,
 };
 
+const useAppState = selector(() => STATE.appState);
+const useWorkerState = selector(() => STATE.workerState);
+const useResults = selector(() => STATE.results);
+
 function search(query: string): void {
   if (query) {
     STATE.appState = AppState.WaitingForQuery;
@@ -25,7 +31,7 @@ function search(query: string): void {
   }
 
   STATE.results = null;
-  updateNextFrame();
+  requestDirtyCheck();
 }
 
 function workerStateToText(s: WorkerState): string {
@@ -44,68 +50,66 @@ function workerStateToText(s: WorkerState): string {
   return "";
 }
 
-const PLACEHOLDER = { placeholder: "Type to search" };
-const SearchField = statefulComponent(class extends Component {
-  private value = "";
-  private events = onInput((ev) => {
-    search(this.value = (ev.target as HTMLInputElement).value);
+const SearchField = component((c) => {
+  let value = "";
+  const events = onInput((ev) => {
+    search(value = (ev.native.target as HTMLInputElement).value);
   });
 
-  render() {
-    return div("search-field").c(
-      input()
-        .a(PLACEHOLDER)
-        .e(this.events)
-        .value(this.value),
-    );
-  }
+  return () => (
+    div("search-field", _,
+      Events(events,
+        input(_, { placeholder: "Type to search", value: VALUE(value) }),
+      ),
+    )
+  );
 });
 
-const Result = statelessComponent<SearchResult>((r) => (
-  div("result").c(
-    div("result-score").c(r.score),
-    div("result-author").c(r.comment.author),
-    div("result-body").c(r.comment.body),
-  )
+const Result = statelessComponent<SearchResult>(({ score, comment: { author, body } }) => (
+  div("result", _, [
+    div("result-score", _, score),
+    div("result-author", _, author),
+    div("result-body", _, body),
+  ])
 ));
 
-const SearchResults = connect<{ appState: AppState, results: SearchResult[] | null }>(
-  (prev) => {
-    const appState = STATE.appState;
-    const results = STATE.results;
+const SearchResults = component((c) => {
+  const getAppState = useAppState(c);
+  const getResults = useResults(c);
 
-    return (prev !== null && prev.appState === appState && prev.results === results) ? prev :
-      { appState, results };
-  },
-  ({ appState, results }) => (
-    div("search-results").c(
-      (appState === AppState.Ready) ?
-        (
-          results ?
-            map(results, (r, i) => Result(r).k(i)) :
-            null
-        ) :
-        div("spinner"),
-    )
-  ),
-);
+  return () => {
+    const appState = getAppState();
+    const results = getResults();
 
-const App = connect<WorkerState>(
-  () => STATE.workerState,
-  (workerState) => div("main").c(
-    (workerState === WorkerState.Ready) ?
-      div("search-view").c(
-        SearchField(),
-        SearchResults(),
-      ) :
-      div("main-progress").c(
+    return (
+      div("search-results", _, appState === AppState.Ready ?
+        (results ? TrackByKey(results.map((r, i) => key(i, Result(r)))) : null) :
         div("spinner"),
-        div("main-progress-text").c(
-          workerStateToText(workerState),
-        ),
-      ),
-  ),
-);
+      )
+    );
+  };
+});
+
+const App = component((c) => {
+  const getWorkerState = useWorkerState(c);
+  return () => {
+    const workerState = getWorkerState();
+
+    return (
+      div("main", _,
+        (workerState === WorkerState.Ready) ?
+          div("search-view", _, [
+            SearchField(),
+            SearchResults(),
+          ]) :
+          div("main-progress", _, [
+            div("spinner"),
+            div("main-progress-text", _, workerStateToText(workerState)),
+          ]),
+      )
+    );
+  };
+});
 
 WORKER.addEventListener("message", (e) => {
   if (typeof e.data !== "number") {
@@ -113,7 +117,7 @@ WORKER.addEventListener("message", (e) => {
     switch (data.type) {
       case "state": {
         STATE.workerState = data.state;
-        updateNextFrame();
+        requestDirtyCheck();
         break;
       }
       case "query": {
@@ -121,7 +125,7 @@ WORKER.addEventListener("message", (e) => {
           if (STATE.queryId === data.id) {
             STATE.appState = AppState.Ready;
             STATE.results = data.results;
-            updateNextFrame();
+            requestDirtyCheck();
           }
         }
         break;
